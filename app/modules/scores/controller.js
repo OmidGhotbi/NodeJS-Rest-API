@@ -1,11 +1,11 @@
 const scoresModel = require ('./model')
 const connection = require('../../../database/mysql/conncection')
 const tokenService = require('../auth/token')
+const serviceValidate = require('./service')
 
 exports.CreateScoreTable =  (req,res)=>{
 
     const newCtreatCsores = scoresModel.createTable();
-    
     res.send({
         sucsess:true,
         message:"table is created",
@@ -15,35 +15,47 @@ exports.CreateScoreTable =  (req,res)=>{
 }
 
 
-exports.saveUid =async (req,res)=>{
-    const db =await connection();
-    console.log('connected to'+ db)
+exports.addScore = async (req,res)=>{
+  try {
+        const inputToken = await tokenService.findToken(req);
+        const checkUid = await scoresModel.SeerchId(inputToken);
+        console.log(checkUid)
+        const {score} = req.body;
+        const {scoreFiled} = req.body;
+        const valid = false
 
-    await db.query("SELECT score FROM scores", function (err, result, fields) {
-        // if any error while executing above query, throw error
-        if (err) throw err;
-        // if there is no error, you have the result
-        const row = Object.values(result)[0]
-        console.log(result);
+        if(!(score , scoreFiled)){
+            res.send({
+                sucsess:false,
+                message:"there are not score and scoreFiled on your body",
+            })
+            return
+        }
+
+        const validates = serviceValidate;
+        
+        for(let i =0;i<validates;i++){
+            if (!valid) 
+            res.send({
+                sucsess:false,
+                message:"input filed not acceptable",
+            })
+       if (validates[i] == scoreFiled) {
+                valid = true
+            }
+        }
+           
+       
+        
+      
+        const addnewScore =await scoresModel.updateScore(checkUid,score,scoreFiled);
+        console.log(score)
         res.send({
             sucsess:true,
-            message:"score is showing!",
-            score:row
-        }) 
-        });
-    
-}
-  
-
-exports.addScore = async (req,res)=>{
-   
-    const inputToken = tokenService.findToken(req);
-    const checkUid = await scoresModel.SeerchUid(inputToken)
-    const {score} = req.body;
-    const addnewScore = await scoresModel.updateScore(checkUid,score);
-    res.send({
-        sucsess:true,
-        message:"update",
-        addnewScore
-    })
+            message:"updated",
+            score:addnewScore,
+       })
+       } catch (error) {
+        console.log( error);       
+    }
 }

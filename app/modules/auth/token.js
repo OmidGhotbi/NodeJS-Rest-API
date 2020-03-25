@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken')
-
+const config = require('./config')
 
 exports.findToken = (req)=>{
 
     if (!('authorization' in req.headers)){
- 
+        
         return false
     }
     const {authorization} = req.headers;
@@ -16,7 +16,7 @@ exports.findToken = (req)=>{
 }
 
 exports.generate = (params)=>{
-    return jwt.sign(params,process.env.JTW_SECRET);
+    return jwt.sign(params,process.env.JTW_SECRET,{expiresIn: {"tokenLife": 900}});
 };
 
 exports.verify=(token)=>{

@@ -1,0 +1,1 @@
+exports.validate = ['score','scoreCup','scoreTeam','scoreTeamDistance','scoreTeamEvent','scoreChalenge1','scoreChalenge1','scoreChalenge2','scoreChalenge3']
